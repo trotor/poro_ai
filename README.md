@@ -7,6 +7,8 @@ pip install pillow
 
 create images directory
 
-python porohaku.py 
+Start fetching images:
+python poro.py 
 
+TODO: Fetch images, make AI, xxx, profit!
 
