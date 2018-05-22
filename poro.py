@@ -1,4 +1,3 @@
-#Pillow suositeltu tuon PIL:n tilalle truetype supportin takia
 #pip install pillow
 #
 # Porotilanne, Tero Ronkko, tero.ronkko@gmail.com 2015-2018
@@ -7,10 +6,9 @@
 #python 3.4 Translation
 
 # HIstory:
-# 21.5.2018 Github ja siistitään - tehdään AI toteutus
+# 21.5.2018 Github and cleanup
 # 28.6.2016 Condaversion
 
-# TODO: Englishsss
 
 station = "C14565";
 cameraid = "C1456501";
@@ -52,7 +50,6 @@ def haeporoja():
     response = urlopen(url)
     data = json.loads(response.read())
     timetaken = "";
-    #print (data['cameraStations'][0]['cameraPresets'])
     bSuccess = False;
     for camera in data['cameraStations'][0]['cameraPresets']:
         if (camera['id'] == cameraid):
@@ -63,50 +60,29 @@ def haeporoja():
         print("Couldn't fetch info...")
         return;
     #Timestamp: 2018-05-22T09:49:49+03:00
-    datetime_object = dateutil.parser.parse (timetaken)#datetime.datetime.strptime(timetaken, "%Y-%m-%dT%H:%M:%S")
-    #print (datetime_object.strftime("%d.%m.%Y %H:%M is most recent image (from response)"))
+    datetime_object = dateutil.parser.parse (timetaken)
     
 
-    #return;
     global s
-    #Haetaan uusin vÃÂ¤liaikaiseen
-    #  tmpporo = 'images\\tmpporo.jpg'
-    # TODO: Make this dynamic too from json above...
-    #   urlretrieve('http://weathercam.digitraffic.fi/C1456501.jpg', 
-    #               tmpporo)
-
-    #sit uusin porofile:
-    #TÃÂ¤hÃÂ¤n filen testaus
-
-    #    if not os.path.isfile(uusinporo):
-    #        print ("First run")
-    #        shutil.copy(tmpporo, uusinporo)
+   
 
     finalname = datetime_object.strftime("images\\poro%Y%m%d%H%M.jpg");
 
-    #TODO Make this compare if one with current name exists...
     if os.path.isfile(finalname):
         print (datetime.datetime.now().strftime("%d.%m.%Y %H:%M - Image exists: " + finalname));
     else:
-        uusinporo = 'images\\latestporo.jpg'
         urlretrieve('http://weathercam.digitraffic.fi/C1456501.jpg', 
-                uusinporo)
+                finalname)
     
         print (datetime_object.strftime("%d.%m.%Y %H:%M - New image: " + finalname));
-        #print ("Tallennetaan nimellÃ¤: " + finalname)
-        img = Image.open(uusinporo)
+        img = Image.open(finalname)
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype("C64_Pro-STYLE.ttf", 10)
         sdatestamp = datetime_object.strftime("Porotilanne %d.%m.%Y %H:%M");
         draw.text((0, 12),sdatestamp,(255,255,255),font=font)
         img.save(finalname)
-        #shutil.copy(tmpporo, uusinporo)
         
-
-#shutil.copy(tmpporo, finalname)
-
 while True:
-    #print ("Aloitetaan")
     haeporoja();
     time.sleep(300 + random.randint(0,120));
 
