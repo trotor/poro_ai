@@ -1,0 +1,1 @@
+This directory holds two subdirectories for classes of test set images (bad and good)

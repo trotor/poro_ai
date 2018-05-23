@@ -1,0 +1,1 @@
+This folder contains images fetched from the camera.
