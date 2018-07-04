@@ -8,11 +8,12 @@
 # HIstory:
 # 21.5.2018 Github and cleanup
 # 28.6.2016 Condaversion
+# 4.7.2018 Error catching
 
 
 station = "C14565";
 cameraid = "C1456501";
-version = "1.1"
+version = "1.2"
 from dateutil import parser
 try:
     from urllib.request import urlretrieve
@@ -48,40 +49,45 @@ print
 def haeporoja():
     url = "https://tie.digitraffic.fi/api/v1/data/camera-data/" + station
     response = urlopen(url)
-    data = json.loads(response.read())
-    timetaken = "";
-    bSuccess = False;
-    for camera in data['cameraStations'][0]['cameraPresets']:
-        if (camera['id'] == cameraid):
-            #print (camera)
-            timetaken = camera['measuredTime']
-            bSuccess = True;
-    if (not bSuccess):
-        print("Couldn't fetch info...")
-        return;
-    #Timestamp: 2018-05-22T09:49:49+03:00
-    datetime_object = dateutil.parser.parse (timetaken)
+    try:
+        data = json.loads(response.read())
     
-
-    global s
-   
-
-    finalname = datetime_object.strftime("images\\poro%Y%m%d%H%M.jpg");
-
-    if os.path.isfile(finalname):
-        print (datetime.datetime.now().strftime("%d.%m.%Y %H:%M - Image exists: " + finalname));
-    else:
-        urlretrieve('http://weathercam.digitraffic.fi/C1456501.jpg', 
-                finalname)
-    
-        print (datetime_object.strftime("%d.%m.%Y %H:%M - New image: " + finalname));
-        img = Image.open(finalname)
-        draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype("C64_Pro-STYLE.ttf", 10)
-        sdatestamp = datetime_object.strftime("Porotilanne %d.%m.%Y %H:%M");
-        draw.text((0, 12),sdatestamp,(255,255,255),font=font)
-        img.save(finalname)
+        timetaken = "";
+        bSuccess = False;
+        if ('cameraStations' in data):
+            for camera in data['cameraStations'][0]['cameraPresets']:
+                if (camera['id'] == cameraid):
+                    #print (camera)
+                    timetaken = camera['measuredTime']
+                    bSuccess = True;
+        if (not bSuccess):
+            print("Couldn't fetch info...")
+            return;
+        #Timestamp: 2018-05-22T09:49:49+03:00
+        datetime_object = dateutil.parser.parse (timetaken)
         
+
+        global s
+       
+
+        finalname = datetime_object.strftime("images\\poro%Y%m%d%H%M.jpg");
+
+        if os.path.isfile(finalname):
+            print (datetime.datetime.now().strftime("%d.%m.%Y %H:%M - Image exists: " + finalname));
+        else:
+            urlretrieve('http://weathercam.digitraffic.fi/C1456501.jpg', 
+                    finalname)
+        
+            print (datetime_object.strftime("%d.%m.%Y %H:%M - New image: " + finalname));
+            img = Image.open(finalname)
+            draw = ImageDraw.Draw(img)
+            font = ImageFont.truetype("C64_Pro-STYLE.ttf", 10)
+            sdatestamp = datetime_object.strftime("Porotilanne %d.%m.%Y %H:%M");
+            draw.text((0, 12),sdatestamp,(255,255,255),font=font)
+            img.save(finalname)
+    except:
+        print("Couldn't fetch, trying again later...");
+        return;
 while True:
     haeporoja();
     time.sleep(300 + random.randint(0,120));
