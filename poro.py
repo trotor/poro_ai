@@ -9,20 +9,14 @@
 # 21.5.2018 Github and cleanup
 # 28.6.2016 Condaversion
 # 4.7.2018 Error catching
+# 24.11.2019 Urllib to requests for proxy
 
 
-station = "C14565";
-cameraid = "C1456501";
-version = "1.2"
+version = "1.2.1"
 from dateutil import parser
-try:
-    from urllib.request import urlretrieve
-    from urllib.request import urlopen;
-except ImportError:
-    from urllib import urlretrieve
-    from urllib import urlopen;
+import urllib2
 import shutil,datetime
-import urllib;
+import requests;
 import json;
 from PIL import Image
 from PIL import ImageFont
@@ -46,11 +40,14 @@ print
 #http://137.116.198.92/tilannekuva-ws/cameras?imageId=C1456501201511260838
 #http://weathercam.digitraffic.fi/C1456501.jpg
 
+station = "C14565";
+cameraid = "C1456501";
+
 def haeporoja():
     url = "https://tie.digitraffic.fi/api/v1/data/camera-data/" + station
-    response = urlopen(url)
+    response = requests.get(url)
     try:
-        data = json.loads(response.read())
+        data = json.loads(response.text)
     
         timetaken = "";
         bSuccess = False;
@@ -70,14 +67,18 @@ def haeporoja():
         global s
        
 
-        finalname = datetime_object.strftime("images\\poro%Y%m%d%H%M.jpg");
+        finalfilename = datetime_object.strftime("poro%Y%m%d%H%M.jpg");
+	finalname = "images" + os.path.sep + finalfilename;
 
         if os.path.isfile(finalname):
             print (datetime.datetime.now().strftime("%d.%m.%Y %H:%M - Image exists: " + finalname));
         else:
-            urlretrieve('http://weathercam.digitraffic.fi/C1456501.jpg', 
-                    finalname)
-        
+            r = requests.get('http://weathercam.digitraffic.fi/C1456501.jpg')
+            if r.status_code == 200:
+                with open(finalname, 'wb') as f:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, f)
+                    f.close; 
             print (datetime_object.strftime("%d.%m.%Y %H:%M - New image: " + finalname));
             img = Image.open(finalname)
             draw = ImageDraw.Draw(img)

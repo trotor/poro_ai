@@ -1,0 +1,5 @@
+pip install python-dateutil
+#Some linux dists:
+[sudo] apt-get install libjpeg-dev zlib1g-dev
+pip install pillow
+
