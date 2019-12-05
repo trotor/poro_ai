@@ -75,17 +75,19 @@ def haeporoja():
         else:
             r = requests.get('http://weathercam.digitraffic.fi/C1456501.jpg')
             if r.status_code == 200:
+                #print r.text
                 with open(finalname, 'wb') as f:
-                    r.raw.decode_content = True
-                    shutil.copyfileobj(r.raw, f)
+                    #r.raw.decode_content = True
+                    #shutil.copyfileobj(r.raw, f)
+                    f.write(r.content)
                     f.close; 
             print (datetime_object.strftime("%d.%m.%Y %H:%M - New image: " + finalname));
-            img = Image.open(finalname)
-            draw = ImageDraw.Draw(img)
-            font = ImageFont.truetype("C64_Pro-STYLE.ttf", 10)
-            sdatestamp = datetime_object.strftime("Porotilanne %d.%m.%Y %H:%M");
-            draw.text((0, 12),sdatestamp,(255,255,255),font=font)
-            img.save(finalname)
+            #img = Image.open(finalname)
+            #draw = ImageDraw.Draw(img)
+            #font = ImageFont.truetype("C64_Pro-STYLE.ttf", 10)
+            #sdatestamp = datetime_object.strftime("Porotilanne %d.%m.%Y %H:%M");
+            #draw.text((0, 12),sdatestamp,(255,255,255),font=font)
+            #img.save(finalname)
     except:
         print("Couldn't fetch, trying again later...");
         return;
